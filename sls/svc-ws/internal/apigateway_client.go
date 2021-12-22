@@ -10,31 +10,29 @@ import (
 	"github.com/Jimeux/sls-chat-app/sls/lib/awsiface"
 )
 
-// Client is a simple wrapper around APIGatewayManagementAPI.
-type Client struct {
+// APIClient is a simple wrapper around APIGatewayManagementAPI.
+type APIClient struct {
 	client awsiface.APIGatewayManagementAPI
 }
 
-func NewAPIGatewayClient(client awsiface.APIGatewayManagementAPI) *Client {
-	return &Client{client: client}
+func NewAPIGatewayClient(client awsiface.APIGatewayManagementAPI) *APIClient {
+	return &APIClient{client: client}
 }
 
-// NewAPIGatewayClientFromConfig create a Client instance from a given aws.Config instance.
-// The stage and domain name values are used to construct the endpoint resolver required by
-// apigatewaymanagementapi.Client.
-func NewAPIGatewayClientFromConfig(cfg aws.Config, stage, domainName string) *Client {
+// NewAPIClientFromConfig create a APIClient instance from a given aws.Config instance.
+// stage and domain are used to construct the required endpoint resolver.
+func NewAPIClientFromConfig(cfg aws.Config, stage, domainName string) *APIClient {
 	var endpoint url.URL
 	endpoint.Scheme = "https"
 	endpoint.Path = stage
 	endpoint.Host = domainName
 	endpointResolver := apigatewaymanagementapi.EndpointResolverFromURL(endpoint.String())
-
 	return NewAPIGatewayClient(apigatewaymanagementapi.NewFromConfig(
 		cfg, apigatewaymanagementapi.WithEndpointResolver(endpointResolver)))
 }
 
-// Publish posts data to the WebSocket connection identified by connID.
-func (c *Client) Publish(ctx context.Context, connID string, data []byte) error {
+// Publish posts data to the connection identified by connID.
+func (c *APIClient) Publish(ctx context.Context, connID string, data []byte) error {
 	_, err := c.client.PostToConnection(ctx, &apigatewaymanagementapi.PostToConnectionInput{
 		Data:         data,
 		ConnectionId: aws.String(connID),

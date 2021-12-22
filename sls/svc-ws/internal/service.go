@@ -11,11 +11,11 @@ import (
 
 // WebSocketService implements the core logic of svc-ws.
 type WebSocketService struct {
-	client     *Client
+	client     *APIClient
 	repository *Repository
 }
 
-func NewWebSocketService(client *Client, repository *Repository) *WebSocketService {
+func NewWebSocketService(client *APIClient, repository *Repository) *WebSocketService {
 	return &WebSocketService{
 		client:     client,
 		repository: repository,

@@ -20,7 +20,7 @@ func main() {
 	cf := ws.NewConfig()
 	cfg, _ := config.LoadDefaultConfig(context.Background())
 	repository := ws.NewRepositoryFromConfig(cfg, cf.ConnectionsTable)
-	client := ws.NewAPIGatewayClientFromConfig(cfg, cf.Stage, cf.APIGatewayDomain)
+	client := ws.NewAPIClientFromConfig(cfg, cf.Stage, cf.APIGatewayDomain)
 	svc = ws.NewWebSocketService(client, repository)
 
 	lambda.Start(ws.Middleware(logger, handler))

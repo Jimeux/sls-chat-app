@@ -1,4 +1,4 @@
-service: sls-chat-app-svc
+service: sls-svc-ws
 frameworkVersion: '2'
 
 provider:

@@ -1,4 +1,8 @@
 SHELL := /bin/bash
+.PHONY: clean build test deploy destroy deploy-% log-% tail-%
+
+clean:
+	rm -rf ./bin
 
 build:
 	@echo "Building all handlers:"
@@ -11,14 +15,11 @@ build:
 test:
 	go test ./handlers/...
 
-clean:
-	rm -rf ./bin
-
-destroy-stack:
-	sls remove
-
 deploy: clean build test
 	sls deploy --verbose
+
+destroy:
+	sls remove
 
 deploy-%: clean
 	go test ./handlers/$*/...

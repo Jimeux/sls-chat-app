@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Config initialises and stores environment variables.
 type Config struct {
 	Stage            string
 	ConnectionsTable string

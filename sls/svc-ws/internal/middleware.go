@@ -8,6 +8,7 @@ import (
 
 type HandlerFunc func(ctx context.Context, req *events.APIGatewayWebsocketProxyRequest) (Response, error)
 
+// Middleware executed initialization logic common to all WS handlers.
 func Middleware(logger *Logger, next HandlerFunc) HandlerFunc {
 	return func(ctx context.Context, req *events.APIGatewayWebsocketProxyRequest) (Response, error) {
 		// set common context values for logging
@@ -16,7 +17,7 @@ func Middleware(logger *Logger, next HandlerFunc) HandlerFunc {
 
 		// flush buffered logs on exit
 		defer logger.Sync()
-		logger.Info(ctx, "two-way websocket: "+req.RequestContext.RouteKey)
+		logger.Info(ctx, "request to "+req.RequestContext.RouteKey)
 
 		return next(ctx, req)
 	}
