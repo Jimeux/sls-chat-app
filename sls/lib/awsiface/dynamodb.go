@@ -15,6 +15,7 @@ type DynamoDB interface {
 
 type MockDDB struct {
 	DynamoDB
+
 	DeleteItemFn      func(ctx context.Context, params *dynamodb.DeleteItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.DeleteItemOutput, error)
 	DeleteItemInvoked bool
 

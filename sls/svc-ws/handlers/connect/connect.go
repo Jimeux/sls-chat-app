@@ -10,11 +10,15 @@ import (
 	ws "github.com/Jimeux/sls-chat-app/sls/svc-ws/internal"
 )
 
+// Package-level vars survive for the life of the
+// Lambda, and help avoid unnecessary allocations.
 var (
 	logger *ws.Logger
 	svc    *ws.WebSocketService
 )
 
+// main initialises package-level vars and calls lambda.Start, passing
+// handler, which is wrapped in middleware that initialises logging.
 func main() {
 	logger = ws.NewLogger()
 	cf := ws.NewConfig()
@@ -26,6 +30,7 @@ func main() {
 	lambda.Start(ws.Middleware(logger, handler))
 }
 
+// handler delegates to WebSocketService to avoid implementing core logic itself.
 func handler(ctx context.Context, event *events.APIGatewayWebsocketProxyRequest) (ws.Response, error) {
 	res, err := svc.Connect(ctx, event.RequestContext.ConnectionID)
 	if err != nil {
