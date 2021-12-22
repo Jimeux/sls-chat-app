@@ -1,0 +1,69 @@
+service: sls-chat-app-svc
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: go1.x
+  lambdaHashingVersion: 20201221
+  stage: dev
+  region: ap-northeast-1
+  websocketsApiName: chat-api-websocket-api
+  # The route selection expression
+  websocketsApiRouteSelectionExpression: $request.body.action
+  environment:
+    # CLI options can be accessed with opt
+    STAGE: ${opt:stage, 'dev'}
+    # Generated CloudFormation resources can be referenced 
+    # using CloudFormation syntax. Refer to JSON files in 
+    # generated .serverless directory for resources names.
+    API_GATEWAY_DOMAIN:
+      Fn::GetAtt: [ WebsocketsApi, ApiEndpoint ]
+    # CloudFormation resources defined in the Resources 
+    # section can also be accessed.
+    CONNECTIONS_TABLE:
+      Ref: ConnectionTable
+  # IAM roles are defined for the entire service. 
+  # Implementing zero trust roles per Lambda can be 
+  # done with manual CloudFormation.
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:DeleteItem
+            - dynamodb:Scan
+          Resource:
+            Fn::GetAtt: [ ConnectionTable, Arn ]
+
+package:
+  patterns:
+    - '!./**'
+    - ./bin/**
+
+functions:
+  connect:
+    # Go binary will be output here
+    handler: bin/connect
+    events:
+      - websocket:
+          # Predefined $connect route will
+          # be integrated with this function
+          route: $connect
+
+resources:
+  # Raw CloudFormation can be added here
+  Resources:
+    ConnectionTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: sls-chat-app-connections
+        AttributeDefinitions:
+          - AttributeName: connection_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: connection_id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
