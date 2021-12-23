@@ -56,14 +56,20 @@ functions:
 resources:
   # Raw CloudFormation can be added here
   Resources:
+    # This is the definition of the DynamoDB table for
+    # storing references to active WebSocket connections.
     ConnectionTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: sls-chat-app-connections
+        # We only need to define the key here, and can
+        # freely manage other attributes in the application
+        # layer due to the NoSQL nature of DynamoDB.
         AttributeDefinitions:
           - AttributeName: connection_id
             AttributeType: S
         KeySchema:
           - AttributeName: connection_id
             KeyType: HASH
+        # PAY_PER_REQUEST sets on-demand pricing
         BillingMode: PAY_PER_REQUEST
